@@ -1,0 +1,56 @@
+-- Better Version Of UIS
+
+local InputService = {} -- by gerpation ( pronounced with a french accent )
+
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService") 
+
+InputService.Clicks = {}
+InputService.Holds = {}
+
+local rate = 0.2
+
+export type InputType = "Holdable" | "Pressable"
+
+InputService.Pressable = function(Key : Enum.KeyCode,Callback : (any) -> ())
+	InputService.Clicks[Key] = Callback
+end
+
+InputService.Holdable = function(Key : Enum.KeyCode,Callback : (any) -> ())
+	InputService.Holds[Key] = Callback
+end
+
+InputService.Input = function(Key : Enum.KeyCode | string,InputType : InputType,Callback : (any) -> ())
+	if typeof(Key) == "string" then
+		Key = Enum.KeyCode(Key:gsub("^%l", string.upper))
+	end
+	if InputType == "Pressable" then
+		InputService.Pressable(Key,Callback)
+	elseif InputType == "Holdable" then
+		InputService.Holdable(Key,Callback)
+	end
+end
+
+function InputService:Init()
+	for Key : Enum.KeyCode, Callback : (any) -> () in InputService.Clicks do
+		UserInputService.InputBegan:Connect(function(input,gpe)
+			if gpe then return end
+			if input.KeyCode == Key then
+				task.spawn(Callback)
+			end
+		end)
+	end
+	
+	task.defer(function()
+		while true do
+			for Key : Enum.KeyCode, Callback : (any) -> () in InputService.Holds do
+				if UserInputService:IsKeyDown(Key) then
+					task.spawn(Callback)
+				end
+			end
+			task.wait(rate)
+		end
+	end)
+end
+
+return InputService

@@ -1,0 +1,60 @@
+--[[
+	Hey Brotation From HiddenDevs, I Lwk Have No Idea Which Script I Should Put As An Example
+	So I Chose This One, I Think It's A Good Example :3
+	If U Dont Like It I Will Cry
+	Pls Approve My Application :(
+]] 
+
+local Module = {}
+
+local DataStore = game:GetService("DataStoreService")
+local Data = DataStore:GetDataStore("Leaderstats")
+
+-- helper function
+local function create(plr : Player, type : number | boolean | string, name : string)
+	local leaderstats
+	if not plr:FindFirstChild("leaderstats") then
+		leaderstats = Instance.new("Folder")
+		leaderstats.Parent = plr
+		leaderstats.Name = "leaderstats"
+	else
+		leaderstats = plr:FindFirstChild("leaderstats")
+	end
+	
+	local instanceType = typeof(type) == "number" and "NumberValue"  or typeof(type) == "boolean" and "BoolValue" or "StringValue"
+	
+	local stat = Instance.new(instanceType)
+	stat.Parent = leaderstats
+	stat.Name = name
+	stat.Value = type
+end
+
+-- returns leaderstats
+local function get(plr : Player)
+	local leaderstats : Folder = plr:FindFirstChild("leaderstats")
+	return leaderstats
+end
+
+-- returns the value of the data storage
+local function values(plr : Player)
+	return Data:GetAsync(plr.UserId)
+end
+
+Module.OnPlayerAdded = function(plr : Player)
+	local storage = values(plr)
+	create(plr, storage and storage["Coins"] or 0, "Coins") -- example
+	create(plr, storage and storage["Strength"] or 1, "Strength") -- example
+	create(plr, storage and storage["JumpPower"] or 1, "JumpPower") -- example
+end
+
+Module.OnPlayerRemoving = function(plr : Player)
+	
+	local stored = {}
+	for _, value in get(plr):GetChildren() do
+		stored[value.Name] = value.Value
+	end
+	
+	Data:SetAsync(plr.UserId,stored)
+end
+
+return Module

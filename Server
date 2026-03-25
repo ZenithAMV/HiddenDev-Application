@@ -1,0 +1,6 @@
+local Players = game:GetService("Players")
+
+local Module = require(game:GetService("ReplicatedStorage").Leaderstats)
+
+Players.PlayerAdded:Connect(Module.OnPlayerAdded)
+Players.PlayerRemoving:Connect(Module.OnPlayerRemoving)

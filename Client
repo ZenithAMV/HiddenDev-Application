@@ -1,0 +1,11 @@
+local InputService = require(game.ReplicatedStorage.InputService)
+
+InputService.Input(Enum.KeyCode.E,"Pressable",function()
+	print("[InputService]: You Pressed E!")
+end)
+
+InputService.Input(Enum.KeyCode.Q,"Holdable",function()
+	print("[InputService]: You're Holding Q!")
+end)
+
+InputService:Init()
